@@ -52,6 +52,7 @@ GO
 ALTER ROLE [db_owner] ADD MEMBER [UzytkownikStrony];
 GO
 
+// execute after registering user with admin1 username 
 UPDATE Users
 SET Role = 'admin'
 WHERE Username = 'admin1';
