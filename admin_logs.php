@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Activity Logs</title>
+    <title>Activity Logssssssss</title>
 </head>
 <body>
     <div>
