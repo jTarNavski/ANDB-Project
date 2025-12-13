@@ -1,5 +1,52 @@
 <?php
+session_start();
+require_once 'db.php';
+$message = "";
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM Users WHERE Username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['PasswordHash'])) {
+        $_SESSION['is_logged_in'] = true;
+        $_SESSION['user_login'] = $user['Username'];
+        $_SESSION['user_id'] = $user['Id'];
+        $_SESSION['role'] = $user['Role'];
+        
+        // --- 1. UPDATE LAST LOGIN TIMESTAMP (Fixes "Never" in Admin Panel) ---
+        try {
+            $updateSql = "UPDATE Users SET LastLogin = GETDATE() WHERE Id = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->execute([$user['Id']]);
+        } catch (Exception $e) {
+            // Ignore error
+        }
+
+        // --- 2. LOG ACTIVITY TO HISTORY TABLE ---
+        try {
+            $logSql = "INSERT INTO ActivityLog (UserId, Username, UserRole, ActivityType) VALUES (?, ?, ?, 'LOGIN')";
+            $logStmt = $conn->prepare($logSql);
+            $logStmt->execute([$user['Id'], $user['Username'], $user['Role']]);
+        } catch (Exception $e) {
+            // Ignore error
+        }
+
+        // --- 3. REDIRECT ---
+        if ($user['Role'] === 'admin') {
+             header("Location: admin.php");
+        } else {
+             header("Location: dashboard.php");
+        }
+        exit;
+    } else {
+        $message = "Invalid username or password!";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
