@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['is_logged_in']) || $_SESSION['is_logged_in'] !== true) {
+    header("Location: index.php");
+    exit;
+}
+
+$username = $_SESSION['user_login'];
+$role = $_SESSION['role'] ?? 'user'; 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +27,7 @@
     <header>
         <div>E-Learning Platform</div>
         <div>
-            <span>Welcome</span>
+            <span>Welcome, <?php echo htmlspecialchars($username); ?></span>
             <a href="logout.php">Logout</a>
         </div>
     </header>
@@ -26,12 +37,16 @@
         <a href="#">My Courses</a>
         <a href="#">Assignments</a>
         <a href="profile.php">Profile Settings</a>
+        
+        <?php if($role === 'admin'): ?>
+            <a href="admin.php" style="background-color: #d35400; color: white">Admin Panel</a>
+        <?php endif; ?>
     </aside>
 
     <main>
         
         <div>
-            <h1>Hello, dubi!</h1>
+            <h1>Hello, <?php echo htmlspecialchars($username); ?>!</h1>
             <p>Welcome back to your learning dashboard. Here is an overview of your activity.</p>
         </div>
 
