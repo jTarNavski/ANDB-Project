@@ -61,20 +61,25 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f6f8; padding: 20px; }
+        .success { color: #28d00eff; padding: 20px; font-weight: bold;}
+        .error { color: #db061cff; padding: 20px; font-weight: bold;} 
+    </style>
 </head>
 <body>
 
-<div class="container">
+<div>
     <h2>Manage Account Details</h2>
 
     <?php if ($message): ?>
-        <div class="alert <?php echo $messageType; ?>">
-            <?php echo $message; ?>
+        <div class="<?php echo $messageType; ?>">
+            <bold><?php echo $message; ?></bold>
         </div>
     <?php endif; ?>
 
     <form method="post" id="profileForm">
-        <div class="section-title">Personal Information</div>
+        <div>Personal Information</div>
         
         <label>Full Name</label>
         <div id="view-fullname">
@@ -120,7 +125,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
         <br>
 
-        <div class="section-title">Security</div>
+        <div>Security</div>
         <div id="view-password">
             <span>********</span>
             <button type="button" onclick="editField('password')">Change Password</button>
