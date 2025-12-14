@@ -1,3 +1,60 @@
+<?php
+session_start();
+require_once 'db.php';
+
+if (!isset($_SESSION['is_logged_in'])) {
+    header("Location: index.php");
+    exit;
+}
+
+$userId = $_SESSION['user_id'];
+$message = "";
+$messageType = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $fullName = $_POST['fullname'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $social = $_POST['social'];
+    $newPassword = $_POST['password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    if (!empty($newPassword) && ($newPassword !== $confirmPassword)) {
+        $message = "Passwords do not match!";
+        $messageType = "error";
+    } else {
+        try {
+            if (!empty($newPassword)) {
+                $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+                $sql = "UPDATE Users SET FullName=?, Email=?, Phone=?, SocialMedia=?, PasswordHash=? WHERE Id=?";
+                $params = [$fullName, $email, $phone, $social, $hash, $userId];
+            } else {
+                $sql = "UPDATE Users SET FullName=?, Email=?, Phone=?, SocialMedia=? WHERE Id=?";
+                $params = [$fullName, $email, $phone, $social, $userId];
+            }
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+            
+            $logSql = "INSERT INTO ActivityLog (UserId, Username, UserRole, ActivityType) VALUES (?, ?, ?, 'PROFILE_UPDATE')";
+            $logStmt = $conn->prepare($logSql);
+            $logStmt->execute([$userId, $_SESSION['user_login'], $_SESSION['role']]);
+            
+            $message = "Profile updated successfully!";
+            $messageType = "success";
+            
+        } catch (PDOException $e) {
+            $message = "Error updating profile: " . $e->getMessage();
+            $messageType = "error";
+        }
+    }
+}
+
+$stmt = $conn->prepare("SELECT * FROM Users WHERE Id = ?");
+$stmt->execute([$userId]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,8 +78,8 @@
         
         <label>Full Name</label>
         <div id="view-fullname">
-            <div>Duban Dubi
-            <button type="button" onclick="editField('fullname')">[Edit]</button></div>
+            <?php echo htmlspecialchars($user['FullName'] ?? 'Not set'); ?>
+            <button type="button" onclick="editField('fullname')">[Edit]</button>
         </div>
         <div id="edit-fullname" style="display:none;">
             <input type="text" name="fullname" value="<?php echo htmlspecialchars($user['FullName'] ?? ''); ?>">
@@ -32,8 +89,8 @@
 
         <label>Email Address</label>
         <div id="view-email">
-            <div>dubi@duban.com
-            <button type="button" onclick="editField('email')">[Edit]</button></div>
+            <?php echo htmlspecialchars($user['Email'] ?? 'Not set'); ?>
+            <button type="button" onclick="editField('email')">[Edit]</button>
         </div>
         <div id="edit-email" style="display:none;">
             <input type="email" name="email" value="<?php echo htmlspecialchars($user['Email'] ?? ''); ?>" required>
@@ -43,8 +100,8 @@
 
         <label>Phone Number</label>
         <div id="view-phone">
-            <div>123454654123
-            <button type="button" onclick="editField('phone')">[Edit]</button></div>
+            <?php echo htmlspecialchars($user['Phone'] ?? 'Not set'); ?>
+            <button type="button" onclick="editField('phone')">[Edit]</button>
         </div>
         <div id="edit-phone" style="display:none;">
             <input type="text" name="phone" value="<?php echo htmlspecialchars($user['Phone'] ?? ''); ?>">
@@ -54,8 +111,8 @@
 
         <label>Social Media</label>
         <div id="view-social">
-            <div>www.fakebook.com/dubiduban
-            <button type="button" onclick="editField('social')">[Edit]</button></div>
+            <?php echo htmlspecialchars($user['SocialMedia'] ?? 'Not set'); ?>
+            <button type="button" onclick="editField('social')">[Edit]</button>
         </div>
         <div id="edit-social" style="display:none;">
             <input type="text" name="social" value="<?php echo htmlspecialchars($user['SocialMedia'] ?? ''); ?>">
