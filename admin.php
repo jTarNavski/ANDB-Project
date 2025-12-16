@@ -5,6 +5,21 @@ require_once 'db.php';
 if (!isset($_SESSION['is_logged_in']) || $_SESSION['role'] !== 'admin') {
     die("Access Denied. You do not have permission to view this page. <a href='index.php'>Go Home</a>");
 }
+
+$search = $_GET['search'] ?? '';
+$sort = $_GET['sort'] ?? 'Username';
+$allowed_sorts= ['Id', 'Username', 'Email', 'Role', 'CreatedAt', 'LastLogin'];
+
+if (!in_array($sort, $allowed_sorts)) {
+    $sort = 'Username';
+}
+
+$sql = "SELECT * FROM Users WHERE Username LIKE ? ORDER BY $sort";
+$params =["%$search%"];
+
+$stmt =$conn->prepare($sql);
+$stmt->execute($params);
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -41,6 +56,24 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['role'] !== 'admin') {
                 <th>Actions</th>
             </tr>
         </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+            <tr>
+                <td><?php echo $user['Id']; ?></td>
+                <td><?php echo htmlspecialchars($user['Username']); ?></td>
+                <td><?php echo htmlspecialchars($user['Email']?? '-'); ?></td>
+                <td>
+                    <?php echo ($user['Role'] ==='admin') ? '<strong>Admin</strong>' : 'User'; ?>
+                </td>
+                <td>
+                    <?php echo $user['LastLogin'] ?? 'Never'; ?>
+                </td>
+                <td>
+                    <a href="admin_edit.php?id=<?php echo $user['Id'];?>">Edit</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 </body>
 </html>
