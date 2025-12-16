@@ -40,19 +40,21 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <form>
-        <input type="text" name="search" placeholder="Search username..." value="<?php echo htmlspecialchars($search); ?>">
+        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>">
         <button type="submit">Search</button>
         <a href="admin.php">Reset</a>
     </form>
 
     <table>
+        <h2>Users:</h2>
+        <p>Number of registered users: <?php echo count($users); ?></p>
         <thead>
             <tr>
                 <th><a href="?sort=Id">ID</a></th>
                 <th><a href="?sort=Username">Username</a></th>
                 <th><a href="?sort=Email">Email</a></th>
                 <th><a href="?sort=Role">Role</a></th>
-                <th>Last Login</th>
+                <th>Last active</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -60,7 +62,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($users as $user): ?>
             <tr>
                 <td><?php echo $user['Id']; ?></td>
-                <td><?php echo htmlspecialchars($user['Username']); ?></td>
+                <td><strong><?php echo htmlspecialchars($user['Username']); ?><strong></td>
                 <td><?php echo htmlspecialchars($user['Email']?? '-'); ?></td>
                 <td>
                     <?php echo ($user['Role'] ==='admin') ? '<strong>Admin</strong>' : 'User'; ?>
