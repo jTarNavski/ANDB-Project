@@ -26,12 +26,12 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Admin Panel</title>
+    <title>Admin Dashboard</title>
 </head>
 <body>
 
     <div>
-        <h2>Admin Panel: User Management</h2>
+        <h2>Admin Dashboard: User Management</h2>
         <div>
             <a href="admin_logs.php" >View System Logs</a>
             <a href="dashboard.php">User Dashboard</a>
@@ -67,9 +67,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </td>
                 <td>
                     <?php echo $user['LastLogin'] ?? 'Never'; ?>
-                </td>
-                <td>
-                    <a href="admin_edit.php?id=<?php echo $user['Id'];?>">Edit</a>
                 </td>
             </tr>
             <?php endforeach; ?>
