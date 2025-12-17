@@ -20,6 +20,7 @@ $params =["%$search%"];
 $stmt =$conn->prepare($sql);
 $stmt->execute($params);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +43,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form>
         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>">
         <button type="submit">Search</button>
-        <a href="admin.php">Reset</a>
+        <a href="admin.php">Reset search</a>
     </form>
 
     <table>
@@ -55,7 +56,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th><a href="?sort=Email">Email</a></th>
                 <th><a href="?sort=Role">Role</a></th>
                 <th>Last active</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +69,9 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </td>
                 <td>
                     <?php echo $user['LastLogin'] ?? 'Never'; ?>
+                </td>
+                <td>
+                    <a href="admin_edit.php?id=<?php echo $user['Id']; ?>">Edit</a>
                 </td>
             </tr>
             <?php endforeach; ?>

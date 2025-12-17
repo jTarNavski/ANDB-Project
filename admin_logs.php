@@ -3,7 +3,7 @@ session_start();
 require_once 'db.php';
 
 if (!isset($_SESSION['is_logged_in']) || $_SESSION['role'] !== 'admin') {
-    die("Access Denied.");
+    die("Access Denied. You do not have permission to view this page. <a href='index.php'>Go Home</a>");
 }
 
 $sql = "SELECT TOP 50 * FROM ActivityLog ORDER BY LogDate DESC";
@@ -20,7 +20,7 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div>
         <h2>System Activity Logs</h2>
-        <a href="admin.php">Back to Users</a>
+        <a href="admin.php">Back to Admin Dashboard</a>
     </div>
 
     <table>
